@@ -3,7 +3,7 @@ name: Daily Prompt Scraper
 on:
   schedule:
     - cron: '0 0 * * *'  # 毎日日本時間午前9時に実行
-  workflow_dispatch:      # 手動実行ボタンも有効化
+  workflow_dispatch:      # 手動実行ボタン
 
 jobs:
   build:
@@ -22,7 +22,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install feedparser google-generativeai
+          # SDKを最新版に強制アップデートして404エラーを防ぐ
+          pip install -U feedparser google-generativeai
 
       - name: Run scraper
         env:
@@ -33,6 +34,15 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add reports/*.md
-          git commit -m "Update daily prompt hacks [skip ci]" || echo "No changes to commit"
-          git push
+          
+          # reportsフォルダを確実に作成
+          mkdir -p reports
+          git add reports/
+          
+          # 変更がある場合のみコミットする（エラー回避）
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Update daily prompt hacks"
+            git push
+          else
+            echo "No new hacks found today. Skipping commit."
+          fi
