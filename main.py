@@ -26,7 +26,7 @@ def fetch_reddit_rss():
 def analyze_with_gemini(posts, api_key):
     print("[*] Geminiで解析中...")
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash')
     
     prompt = f"""
     あなたはプロンプトエンジニアリングの専門家です。
